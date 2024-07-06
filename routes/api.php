@@ -29,3 +29,5 @@ Route::post('addNew', [UserConttroller::class , 'store'] );
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour la mise à jour de l'utilisateur
+Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
