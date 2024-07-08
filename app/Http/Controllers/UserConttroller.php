@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use app\Http\models\users;
 use app\Http\Requests\UserStoreRequest;
+use App\Models\User;
+use App\Models\Vehicules;
+use Illuminate\Support\Facades\Storage;
 
 class UserConttroller extends Controller
 {
@@ -45,4 +48,50 @@ class UserConttroller extends Controller
         ],200);
 
     }
+
+    //affichage vehicules
+    public function viewVehicule(){
+        $vehicules = Vehicules::all();
+
+        return response()->json([
+            'vehicules'=>$vehicules
+        ],200);
+    }
+
+    //suppression vehicules
+    public function delete($id){
+        // recuperation id
+        $getId= Vehicules::find($id);
+
+        $getId->delete();
+
+        return response()->json([
+            'message' => 'suprrimer'
+        ],200);
+    }
+
+    //Ajout des vehicules
+    public function storeUpload(Request $req){
+
+
+
+        $photo = $req->file('photo');
+        $photoName = $photo->getClientOriginalName();
+        $photoPath = $photo->storeAs('ImageVehicule',$photoName,'public');
+
+
+        $InsertVehicul = new Vehicules();
+        $InsertVehicul->marque = $req->marque;
+        $InsertVehicul->matricule = $req->matricule;
+        $InsertVehicul->photo = $photoName;
+        $InsertVehicul->save();
+        return response()->json([
+            'message' => 'File upload',
+            'file_path' => "/storage/$photoPath",
+            'path' => Storage::url($photoPath)
+        ],200);
+
+
+
+}
 }

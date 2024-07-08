@@ -2,9 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use app\hppt\Controllers\UserConttroller;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\UserConttroller;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,3 +30,8 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour la mise à jour de l'utilisateur
 Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
+
+//vehicule
+Route::get('listeVehicule' , [UserConttroller::class, 'viewVehicule']);
+route::delete('cardelete/{id}',[UserConttroller::class, 'delete']);
+Route::post('addCar',[UserConttroller::class, 'StoreUpload']);
