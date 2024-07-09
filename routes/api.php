@@ -32,10 +32,12 @@ Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour l
 Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
 
 //vehicule
-Route::get('listeVehicule' , [SuperAdminController::class, 'viewVehicule']);
+Route::get('listeVehicul' , [SuperAdminController::class, 'viewVehicule']);
 Route::delete('cardelete/{id}',[SuperAdminController::class, 'delete']);
 Route::post('addCar',[SuperAdminController::class, 'StoreUpload']);
 Route::post('updatCar/{id}',[SuperAdminController::class, 'updateCar']);
+Route::get('listeVehicule/{id}' , [SuperAdminController::class, 'showVehicule']);
+
 //ajout des galerie des vehicules
 Route::post('addGalerie/{id}',[SuperAdminController::class, 'InsertGalerie']);
 Route::get('viewGalerie/{id}' , [SuperAdminController::class, 'ViewGalerie']);
