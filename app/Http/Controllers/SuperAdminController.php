@@ -55,11 +55,18 @@ class SuperAdminController extends Controller
 
     //affichage vehicules
     public function viewVehicule(){
-        $vehicules = Vehicules::all();
+        try {
+            $vehicules = Vehicules::all();
 
         return response()->json([
             'vehicules'=>$vehicules
         ],200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'messageError' => $e->getMessage()
+            ],500);
+        }
+
     }
 
     //suppression vehicules
@@ -95,7 +102,14 @@ class SuperAdminController extends Controller
             'path' => Storage::url($photoPath)
         ],200);
 }
+//affichage des vehicule par id
+public function showVehicule($id){
+    $car = Vehicules::find($id);
 
+    return response()->json([
+        'car' => $car
+    ],200);
+}
 //modifier les vehicule
     public function updateCar(Request $req, $id)
     {
@@ -189,5 +203,5 @@ class SuperAdminController extends Controller
 
 
     //reservation Vehicule
-    
+
 }

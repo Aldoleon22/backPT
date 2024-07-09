@@ -18,3 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('listeVehicule' , [UserConttroller::class, 'viewVehicule']);
+Route::get('/test-cors', function () {
+    return response()->json(['message' => 'CORS working']);
+});
