@@ -12,11 +12,17 @@ use Illuminate\Support\Facades\Storage;
 class UserConttroller extends Controller
 {
     public function index(){
-        $users = User::All();
-
-        return response()->json([
-            'resultat' => $users
-        ],200);
+      
+        try {
+            // Test de connexion à la base de données
+            \DB::connection()->getPdo();
+            $userss = User::all();
+            return response()->json($userss);
+        } catch (\Exception $e) {
+            // Log the exception message
+            \Log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur lors de la récupération des utilisateurs', 'details' => $e->getMessage()], 500);
+        }
     }
     public function store(UserStoreRequest $request)
     {

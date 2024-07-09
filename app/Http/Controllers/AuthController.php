@@ -61,7 +61,7 @@ class AuthController extends Controller
         'name' => 'string|max:255',
         'email' => 'string|email|max:255|unique:users,email,'.$user->id,
         'password' => 'string|min:8|confirmed',
-        'status' => 'string|in:admin,user',
+        'status' => 'string|in:superAdmin,admin,user',
     ]);
 
     if ($validator->fails()) {

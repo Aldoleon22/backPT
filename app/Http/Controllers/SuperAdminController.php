@@ -14,11 +14,13 @@ use Illuminate\Support\Facades\Storage;
 class SuperAdminController extends Controller
 {
     public function index(){
-        $users = User::All();
-
-        return response()->json([
-            'resultat' => $users
-        ],200);
+        try {
+            $users = User::all();
+            return response()->json($users);
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur lors de la récupération des utilisateurs', 'details' => $e->getMessage()], 500);
+        }
     }
     public function store(UserStoreRequest $request)
     {
