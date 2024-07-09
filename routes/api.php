@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserConttroller;
+use App\Http\Controllers\SuperAdminController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,9 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('users', [UserConttroller::class , 'index'] );
-Route::get('users/{id}', [UserConttroller::class , 'show'] );
-Route::post('addNew', [UserConttroller::class , 'store'] );
+Route::get('users', [SuperAdminController::class , 'index'] );
+Route::get('users/{id}', [SuperAdminController::class , 'show'] );
+Route::post('addNew', [SuperAdminController::class , 'store'] );
 // routes/api.php
 
 
@@ -32,6 +32,13 @@ Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour l
 Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
 
 //vehicule
-Route::get('listeVehicule' , [UserConttroller::class, 'viewVehicule']);
-route::delete('cardelete/{id}',[UserConttroller::class, 'delete']);
-Route::post('addCar',[UserConttroller::class, 'StoreUpload']);
+Route::get('listeVehicule' , [SuperAdminController::class, 'viewVehicule']);
+Route::delete('cardelete/{id}',[SuperAdminController::class, 'delete']);
+Route::post('addCar',[SuperAdminController::class, 'StoreUpload']);
+Route::post('updatCar/{id}',[SuperAdminController::class, 'updateCar']);
+//ajout des galerie des vehicules
+Route::post('addGalerie/{id}',[SuperAdminController::class, 'InsertGalerie']);
+Route::get('viewGalerie/{id}' , [SuperAdminController::class, 'ViewGalerie']);
+Route::delete('PhotoDelete/{id}',[SuperAdminController::class, 'deleteGalerie']);
+
+

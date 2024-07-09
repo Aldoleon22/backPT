@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use app\Http\models\users;
 use app\Http\Requests\UserStoreRequest;
+use App\Models\Galerie;
 use App\Models\User;
 use App\Models\Vehicules;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class UserConttroller extends Controller
+class SuperAdminController extends Controller
 {
     public function index(){
         $users = User::All();
@@ -130,4 +132,60 @@ class UserConttroller extends Controller
             ],500);
         }
     }
+
+    //insertion galeries des vehicules
+    public function InsertGalerie(Request $req,$id){
+        try {
+            $galerie = new Galerie();
+            $galerie->vehicules_id=$id;
+            if ($req->hasFile('image')) {
+                $photo = $req->file('image');
+                $photoName = time() . '.' . $photo->getClientOriginalExtension();
+                $photoPath = $photo->storeAs('GalerieVehicule',$photoName,'public');
+                $galerie->image = $photoName;
+            }
+            $galerie->save();
+
+
+
+
+            return response()->json([
+                'message' => 'galerie ajoute',
+                'galerie'=>$galerie
+            ],200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'messageError' => $e->getMessage()
+            ],500);
+        }
+    }
+
+//affichage des photo dans les galerie
+    public function ViewGalerie($id){
+
+            $View = DB::table('galeries')
+            ->select('image')
+            ->where('vehicules_id',$id)
+            ->get();
+
+            return response()->json([
+                'galerie'=>$View
+            ],200);
+    }
+
+    //delete photo galerie
+    public function deleteGalerie($id){
+        // recuperation id
+        $getId= Galerie::find($id);
+
+        $getId->delete();
+
+        return response()->json([
+            'message' => 'suprrimer'
+        ],200);
+    }
+
+
+    //reservation Vehicule
+    
 }
