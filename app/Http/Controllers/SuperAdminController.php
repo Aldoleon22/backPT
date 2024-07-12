@@ -84,7 +84,6 @@ class SuperAdminController extends Controller
     //Ajout des vehicules
     public function storeUpload(Request $req){
 
-try {
 
         $photo = $req->file('photo');
         $photoName = $photo->getClientOriginalName();
@@ -100,19 +99,16 @@ try {
             'message' => 'File upload',
             'file_path' => "/storage/$photoPath",
             'path' => Storage::url($photoPath)
-        ],200);}
-        catch (\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ],$e);
-};
+        ],200);
+       
     }
 //affichage des vehicule par id
 public function showVehicule($id){
     $car = Vehicules::find($id);
-
+    $error = 'sucsesful';
     return response()->json([
-        'car' => $car
+        'car' => $car,
+        'message' => $error
     ],200);
 }
 //modifier les vehicule
