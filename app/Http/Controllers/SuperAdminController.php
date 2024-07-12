@@ -103,9 +103,10 @@ class SuperAdminController extends Controller
 //affichage des vehicule par id
 public function showVehicule($id){
     $car = Vehicules::find($id);
-
+    $error = 'sucsesful';
     return response()->json([
-        'car' => $car
+        'car' => $car,
+        'message' => $error
     ],200);
 }
 //modifier les vehicule
