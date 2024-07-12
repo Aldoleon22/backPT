@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -23,7 +24,7 @@ Route::get('users', [SuperAdminController::class , 'index'] );
 Route::get('users/{id}', [SuperAdminController::class , 'show'] );
 Route::post('addNew', [SuperAdminController::class , 'store'] );
 // routes/api.php
-
+Route::get('/userss', [UserController::class, 'index']);
 
 
 Route::post('register', [AuthController::class, 'register']);
