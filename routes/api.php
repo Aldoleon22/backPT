@@ -47,5 +47,9 @@ Route::get('viewGalerie/{id}' , [SuperAdminController::class, 'ViewGalerie']);
 Route::delete('PhotoDelete/{id}',[SuperAdminController::class, 'deleteGalerie']);
 
 //reservation
+Route::post('reservation/{id}',[SuperAdminController::class, 'reserver'] );
+
+Route::post('/modifier_mot_de_passe', [SuperAdminController::class, 'ModMdp']);
+//reservation bolo
 Route::post('Reserver/{id}',[UserConttroller::class, 'reservation']);
 
