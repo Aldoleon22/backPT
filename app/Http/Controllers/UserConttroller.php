@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 class UserConttroller extends Controller
 {
     public function index(){
-      
+
         try {
             // Test de connexion à la base de données
             \DB::connection()->getPdo();

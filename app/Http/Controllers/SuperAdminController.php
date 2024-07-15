@@ -7,18 +7,21 @@ use app\Http\models\users;
 use app\Http\Requests\UserStoreRequest;
 use App\Models\Galerie;
 use App\Models\User;
+use App\Models\Rendez;
 use App\Models\Vehicules;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SuperAdminController extends Controller
 {
+//User
     public function index(){
         try {
             $users = User::all();
             return response()->json($users);
         } catch (\Exception $e) {
-            \Log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
+            \log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la récupération des utilisateurs', 'details' => $e->getMessage()], 500);
         }
     }
@@ -53,7 +56,7 @@ class SuperAdminController extends Controller
 
     }
 
-    //affichage vehicules
+//affichage vehicules
     public function viewVehicule(){
         try {
             $vehicules = Vehicules::all();
@@ -69,7 +72,7 @@ class SuperAdminController extends Controller
 
     }
 
-    //suppression vehicules
+//suppression vehicules
     public function delete($id){
         // recuperation id
         $getId= Vehicules::find($id);
@@ -81,7 +84,7 @@ class SuperAdminController extends Controller
         ],200);
     }
 
-    //Ajout des vehicules
+//Ajout des vehicules
     public function storeUpload(Request $req){
 
 
@@ -101,16 +104,16 @@ class SuperAdminController extends Controller
             'file_path' => "/storage/$photoPath",
             'path' => Storage::url($photoPath)
         ],200);
-}
+    }
 //affichage des vehicule par id
-public function showVehicule($id){
-    $car = Vehicules::find($id);
-    $error = 'sucsesful';
-    return response()->json([
-        'car' => $car,
-        'message' => $error
-    ],200);
-}
+    public function showVehicule($id){
+        $car = Vehicules::find($id);
+        $error = 'sucsesful';
+        return response()->json([
+            'car' => $car,
+            'message' => $error
+        ],200);
+    }
 //modifier les vehicule
     public function updateCar(Request $req, $id)
     {
@@ -150,7 +153,7 @@ public function showVehicule($id){
         }
     }
 
-    //insertion galeries des vehicules
+//insertion galeries des vehicules
     public function InsertGalerie(Request $req,$id){
         try {
             $galerie = new Galerie();
@@ -190,7 +193,7 @@ public function showVehicule($id){
             ],200);
     }
 
-    //delete photo galerie
+//delete photo galerie
     public function deleteGalerie($id){
         // recuperation id
         $getId= Galerie::find($id);
@@ -202,7 +205,78 @@ public function showVehicule($id){
         ],200);
     }
 
+//reservation Vehicule
+    public function reserver(Request $req, $id){
+        try{
+            $reservation = new Rendez();
+            $vehicules = DB::table('vehicules')->where('id', $id)->first();
+            $users = DB::table('users')->where('id', $id)->first();
 
-    //reservation Vehicule
+            // $vehicules = Vehicule::find($id);
+            $reservation->id_vehicules = $vehicules->id;
+            $reservation->users = Session::get("users")->id;
+            $reservation->datedebut = $req->datedebut;
+            $reservation->datefin = $req->datefin;
+            $reservation->save();
+            return response()->json([
+                'message' => 'something went really wrong'
+            ],500);
+        }catch(\Exception $e) {
+            return response()->json([
+                'messageError' => $e->getMessage()
+            ],500);
+        }
+    }
+//modifier profil
+    public function ModProfil(Request $req, $id)
+    {
 
+        try {
+            $req->validate([
+                "nom"=>"required",
+                "email"=>"required",
+
+            ]);
+            //recuperation de l'id
+            $ModProfil = User::find($id);
+
+
+
+            //modifiation des donnes
+            $ModProfil->nom = $req->nom;
+            $ModProfil->email = $req->email;
+            $ModProfil->update();
+
+            return response()->json([
+                'message' => 'modiifer!',
+
+            ],200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'messageError' => $e->getMessage()
+            ],500);
+        }
+    }
+//Modification Mot de passe
+    public function ModMdp(Request $request, $id){
+        $request->validate([
+            'ancien' => 'required',
+            'newPass' => 'required|min:6|confirmed',
+        ]);
+    
+        $user = auth()->user();
+    
+        if (!Hash::check($request->ancien, $user->password)) {
+            return response()->json(['message' => 'L\'ancien mot de passe est incorrect.'], 400);
+        }
+    
+        $user->password = Hash::make($request->newPass);
+        $user->save();
+    
+        return response()->json(['message' => 'Mot de passe mis à jour avec succès.']);
+    }
+    
+
+    
 }
