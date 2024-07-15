@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserConttroller;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -44,4 +46,6 @@ Route::post('addGalerie/{id}',[SuperAdminController::class, 'InsertGalerie']);
 Route::get('viewGalerie/{id}' , [SuperAdminController::class, 'ViewGalerie']);
 Route::delete('PhotoDelete/{id}',[SuperAdminController::class, 'deleteGalerie']);
 
+//reservation
+Route::post('Reserver/{id}',[UserConttroller::class, 'reservation']);
 

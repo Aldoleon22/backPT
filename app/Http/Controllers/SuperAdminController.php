@@ -18,7 +18,8 @@ class SuperAdminController extends Controller
             $users = User::all();
             return response()->json($users);
         } catch (\Exception $e) {
-            \Log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
+            \log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la récupération des utilisateurs', 'details' => $e->getMessage()], 500);
         }
     }
