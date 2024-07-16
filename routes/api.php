@@ -19,7 +19,7 @@ use App\Http\Controllers\UserController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+Route::put('/users/{id}/status', [AuthController::class, 'updateStatus']);
 Route::get('users', [SuperAdminController::class , 'index'] );
 Route::get('users/{id}', [SuperAdminController::class , 'show'] );
 Route::post('addNew', [SuperAdminController::class , 'store'] );

@@ -140,4 +140,8 @@ class UserConttroller extends Controller
     public function andrana(){
         return view();
     }
+
+
+   
 }
+

@@ -96,5 +96,17 @@ public function deleteUser($id)
 
     return response()->json(['message' => 'User deleted successfully']);
 }
+public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:superAdmin,admin,user',
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->status = $request->status;
+    $user.save();
+
+    return response()->json(['message' => 'Statut mis à jour avec succès']);
+}
 
 }

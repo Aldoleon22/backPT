@@ -83,25 +83,29 @@ class SuperAdminController extends Controller
 
     //Ajout des vehicules
     public function storeUpload(Request $req){
-
-
-        $photo = $req->file('photo');
-        $photoName = $photo->getClientOriginalName();
-        $photoPath = $photo->storeAs('ImageVehicule',$photoName,'public');
-
-
-        $InsertVehicul = new Vehicules();
-        $InsertVehicul->marque = $req->marque;
-        $InsertVehicul->matricule = $req->matricule;
-        $InsertVehicul->photo = $photoName;
-        $InsertVehicul->save();
-        return response()->json([
-            'message' => 'File upload',
-            'file_path' => "/storage/$photoPath",
-            'path' => Storage::url($photoPath)
-        ],200);
-       
+        try {
+            $photo = $req->file('photo');
+            $photoName = $photo->getClientOriginalName();
+            $photoPath = $photo->storeAs('public/ImageVehicule', $photoName);
+    
+            $InsertVehicul = new Vehicules();
+            $InsertVehicul->marque = $req->marque;
+            $InsertVehicul->matricule = $req->matricule;
+            $InsertVehicul->photo = $photoName;
+            $InsertVehicul->save();
+    
+            return response()->json([
+                'message' => 'File uploaded successfully',
+                'file_path' => "/storage/photos/$photoName", // Adjust as per your storage structure
+                'path' => Storage::url("public/photos/$photoName")
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'messageError' => $e->getMessage()
+            ], 500);
+        }
     }
+    
 //affichage des vehicule par id
 public function showVehicule($id){
     $car = Vehicules::find($id);
