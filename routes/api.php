@@ -26,13 +26,13 @@ Route::get('users', [SuperAdminController::class , 'index'] );
 Route::get('users/{id}', [SuperAdminController::class , 'show'] );
 Route::post('addNew', [SuperAdminController::class , 'store'] );
 // routes/api.php
-Route::get('/userss', [UserController::class, 'index']);
+
 
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour la mise à jour de l'utilisateur
-Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
+Route::delete('usersDelete/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
 
 //vehicule
 Route::get('listeVehicul' , [SuperAdminController::class, 'viewVehicule']);

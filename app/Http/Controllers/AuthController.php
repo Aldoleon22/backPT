@@ -95,10 +95,17 @@ class AuthController extends Controller
 
 public function deleteUser($id)
 {
-    $user = User::findOrFail($id);
-    $user->delete();
 
-    return response()->json(['message' => 'User deleted successfully']);
+    try {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'messageError' => $e->getMessage()
+        ],500);
+    }
 }
 
 }
