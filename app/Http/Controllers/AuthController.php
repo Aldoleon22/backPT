@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 
 class AuthController extends Controller
@@ -35,13 +35,13 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            
+
         ]);
     }
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json(['message' => 'Invalid login details'], 401);
         }
 
@@ -51,50 +51,52 @@ class AuthController extends Controller
 
         return response()->json([
             'userName' => $user->name,
+            'userEmail' => $user->email,
+            'userId' => $user->id,
             'role' => $user->status,
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
     }
+
     public function updateUser(Request $request, $id)
-{
-    $user = User::findOrFail($id);
+    {
+        $user = User::findOrFail($id);
 
-    $validator = Validator::make($request->all(), [
-        'name' => 'string|max:255',
-        'email' => 'string|email|max:255|unique:users,email,'.$user->id,
-        'password' => 'string|min:8|confirmed',
-        'status' => 'string|in:superAdmin,admin,user',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255',
+            'email' => 'string|email|max:255|unique:users,email,'.$user->id,
+            'password' => 'string|min:8|confirmed',
+            'status' => 'string|in:superAdmin,admin,user',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 400);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        if ($request->has('status')) {
+            $user->status = $request->status;
+        }
+
+        $user->save();
+
+        return response()->json(['message' => 'User updated successfully']);
     }
 
-    if ($request->has('name')) {
-        $user->name = $request->name;
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully']);
     }
-    if ($request->has('email')) {
-        $user->email = $request->email;
-    }
-    if ($request->has('password')) {
-        $user->password = Hash::make($request->password);
-    }
-    if ($request->has('status')) {
-        $user->status = $request->status;
-    }
-
-    $user->save();
-
-    return response()->json(['message' => 'User updated successfully']);
-}
-
-public function deleteUser($id)
-{
-    $user = User::findOrFail($id);
-    $user->delete();
-
-    return response()->json(['message' => 'User deleted successfully']);
-}
-
 }

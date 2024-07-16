@@ -22,13 +22,16 @@ return new class extends Migration
             ->on('users')
             ->onDelete('cascade')
             ->onUpdate('cascade');
-           
+
             $table->unsignedBigInteger('id_vehicules');
             $table->foreign('id_vehicules')
             ->references('id')
             ->on('vehicules')
             ->onDelete('cascade')
             ->onUpdate('cascade');
+
+            $table->timestamps();
+
         });
     }
 

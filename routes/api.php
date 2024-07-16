@@ -1,10 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserConttroller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,12 +21,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('users', [SuperAdminController::class , 'index'] );
-Route::get('users/{id}', [SuperAdminController::class , 'show'] );
-Route::post('addNew', [SuperAdminController::class , 'store'] );
+Route::get('users', [SuperAdminController::class, 'index']);
+Route::get('users/{id}', [SuperAdminController::class, 'show']);
+Route::post('addNew', [SuperAdminController::class, 'store']);
 // routes/api.php
-Route::get('/userss', [UserController::class, 'index']);
-
+Route::get('/userss', [UserConttroller::class, 'index']);
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
@@ -33,19 +33,20 @@ Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour l
 Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
 
 //vehicule
-Route::get('listeVehicul' , [SuperAdminController::class, 'viewVehicule']);
-Route::delete('cardelete/{id}',[SuperAdminController::class, 'delete']);
-Route::post('addCar',[SuperAdminController::class, 'StoreUpload']);
-Route::post('updatCar/{id}',[SuperAdminController::class, 'updateCar']);
-Route::get('listeVehicule/{id}' , [SuperAdminController::class, 'showVehicule']);
+Route::get('listeVehicul', [SuperAdminController::class, 'viewVehicule']);
+Route::delete('cardelete/{id}', [SuperAdminController::class, 'delete']);
+Route::post('addCar', [SuperAdminController::class, 'StoreUpload']);
+Route::post('updatCar/{id}', [SuperAdminController::class, 'updateCar']);
+Route::get('listeVehicule/{id}', [SuperAdminController::class, 'showVehicule']);
 
 //ajout des galerie des vehicules
-Route::post('addGalerie/{id}',[SuperAdminController::class, 'InsertGalerie']);
-Route::get('viewGalerie/{id}' , [SuperAdminController::class, 'ViewGalerie']);
-Route::delete('PhotoDelete/{id}',[SuperAdminController::class, 'deleteGalerie']);
+Route::post('addGalerie/{id}', [SuperAdminController::class, 'InsertGalerie']);
+Route::get('viewGalerie/{id}', [SuperAdminController::class, 'ViewGalerie']);
+Route::delete('PhotoDelete/{id}', [SuperAdminController::class, 'deleteGalerie']);
 
 //reservation
-Route::post('reservation/{id}',[SuperAdminController::class, 'reserver'] );
 
+Route::post('reservation/{id}', [SuperAdminController::class, 'reserver']);
 Route::post('/modifier_mot_de_passe', [SuperAdminController::class, 'ModMdp']);
 
+Route::get('reservations/{id}', [SuperAdminController::class, 'afficheReservation']);
