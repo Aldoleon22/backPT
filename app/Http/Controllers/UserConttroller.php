@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use app\Http\models\users;
 use app\Http\Requests\UserStoreRequest;
+use App\Models\Reservation;
 use App\Models\User;
 use App\Models\Vehicules;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use Session;
 class UserConttroller extends Controller
 {
     public function index(){
@@ -137,7 +139,27 @@ class UserConttroller extends Controller
         }
     }
 
-    public function andrana(){
-        return view();
+    public function reservation(Request $req, $id)
+    {
+        try {
+            $getIdCar = Vehicules::find($id);
+            $getIdUser = Session::get('user')->id;
+
+            $Reservation = new Reservation();
+            $Reservation->vehicules_id = $getIdCar;
+            $Reservation->users_id = 2;
+            $Reservation->date = $req -> input('date');
+            $Reservation->save();
+
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'messageError' => $e->getMessage()
+            ],500);
+        }
     }
+
+
+   
 }
+

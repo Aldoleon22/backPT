@@ -19,8 +19,9 @@ class SuperAdminController extends Controller
     {
         try {
             $users = User::all();
+            return response()->json(['users'=>$users]);
 
-            return response()->json($users);
+
         } catch (\Exception $e) {
             \log::error('Erreur lors de la récupération des utilisateurs: '.$e->getMessage());
 
@@ -291,16 +292,22 @@ class SuperAdminController extends Controller
             'newPass' => 'required|min:6|confirmed',
         ]);
 
+
         $user = auth()->user();
+
+        if (!Hash::check($request->ancien, $user->password)) {
 
         if (! Hash::check($request->ancien, $user->password)) {
             return response()->json(['message' => 'L\'ancien mot de passe est incorrect.'], 400);
         }
 
+
         $user->password = Hash::make($request->newPass);
         $user->save();
 
+
         return response()->json(['message' => 'Mot de passe mis à jour avec succès.']);
+        }
     }
 
     //Affichage reservation
@@ -312,6 +319,7 @@ class SuperAdminController extends Controller
             if (!$user) {
                 return response()->json(['message' => 'Utilisateur non trouvé'], 404);
             }
+
 
             // Récupérer les réservations de l'utilisateur spécifié par $id
             $reservations = DB::table('rendezs')

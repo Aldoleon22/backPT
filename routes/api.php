@@ -2,9 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserConttroller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,17 +19,18 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-Route::get('users', [SuperAdminController::class, 'index']);
-Route::get('users/{id}', [SuperAdminController::class, 'show']);
-Route::post('addNew', [SuperAdminController::class, 'store']);
+Route::put('/users/{id}/status', [AuthController::class, 'updateStatus']);
+Route::get('users', [SuperAdminController::class , 'index'] );
+Route::get('users/{id}', [SuperAdminController::class , 'show'] );
+Route::post('addNew', [SuperAdminController::class , 'store'] );
 // routes/api.php
-Route::get('/userss', [UserConttroller::class, 'index']);
+
+
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::put('users/{id}', [AuthController::class, 'updateUser']); // Route pour la mise à jour de l'utilisateur
-Route::delete('users/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
+Route::delete('usersDelete/{id}', [AuthController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
 
 //vehicule
 Route::get('listeVehicul', [SuperAdminController::class, 'viewVehicule']);
@@ -48,5 +48,7 @@ Route::delete('PhotoDelete/{id}', [SuperAdminController::class, 'deleteGalerie']
 
 Route::post('reservation/{id}', [SuperAdminController::class, 'reserver']);
 Route::post('/modifier_mot_de_passe', [SuperAdminController::class, 'ModMdp']);
+//reservation bolo
+Route::post('Reserver/{id}',[UserConttroller::class, 'reservation']);
 
 Route::get('reservations/{id}', [SuperAdminController::class, 'afficheReservation']);

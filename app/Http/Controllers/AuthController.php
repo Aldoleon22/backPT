@@ -5,10 +5,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+// use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Validator;
+use Session;
 
 class AuthController extends Controller
 {
@@ -48,13 +50,15 @@ class AuthController extends Controller
         $user = User::where('email', $request['email'])->firstOrFail();
 
         $token = $user->createToken('auth_token')->plainTextToken;
-
+         $Session = Session::put('user',$user);
+         $SessionId=Session::get('user')->id;
         return response()->json([
             'userName' => $user->name,
             'userEmail' => $user->email,
             'userId' => $user->id,
             'role' => $user->status,
             'access_token' => $token,
+            'Session' => $SessionId,
             'token_type' => 'Bearer',
         ]);
     }
@@ -92,11 +96,36 @@ class AuthController extends Controller
         return response()->json(['message' => 'User updated successfully']);
     }
 
-    public function deleteUser($id)
-    {
+public function deleteUser($id)
+{
+
+    try {
         $user = User::findOrFail($id);
         $user->delete();
 
         return response()->json(['message' => 'User deleted successfully']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'messageError' => $e->getMessage()
+        ],500);
     }
+}
+public function updateStatus(Request $request, $id)
+{
+    // Validez la demande
+    $request->validate([
+        'status' => 'required|in:superAdmin,admin,user',
+    ]);
+
+    // Trouver l'utilisateur par son id
+    $user = User::findOrFail($id);
+
+    // Mettre à jour le statut
+    $user->status = $request->status;
+
+    // Sauvegarder les changements
+    $user->save();
+
+    return response()->json(['message' => 'Statut mis à jour avec succès']);
+}
 }
