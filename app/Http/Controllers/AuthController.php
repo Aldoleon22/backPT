@@ -109,15 +109,20 @@ public function deleteUser($id)
 }
 public function updateStatus(Request $request, $id)
 {
+    // Validez la demande
     $request->validate([
         'status' => 'required|in:superAdmin,admin,user',
     ]);
 
+    // Trouver l'utilisateur par son id
     $user = User::findOrFail($id);
+    
+    // Mettre à jour le statut
     $user->status = $request->status;
-    $user.save();
+    
+    // Sauvegarder les changements
+    $user->save();
 
     return response()->json(['message' => 'Statut mis à jour avec succès']);
 }
-
 }
