@@ -194,7 +194,7 @@ class SuperAdminController extends Controller
     {
 
         $View = DB::table('galeries')
-            ->select('image')
+            ->select('image','id')
             ->where('vehicules_id', $id)
             ->get();
 
