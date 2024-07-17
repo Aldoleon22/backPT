@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Session;
+
 class SuperAdminController extends Controller
 {
     //User
@@ -19,8 +19,8 @@ class SuperAdminController extends Controller
     {
         try {
             $users = User::all();
-            return response()->json(['users'=>$users]);
 
+            return response()->json(['users' => $users]);
 
         } catch (\Exception $e) {
             \log::error('Erreur lors de la récupération des utilisateurs: '.$e->getMessage());
@@ -239,6 +239,19 @@ class SuperAdminController extends Controller
             if (! $user) {
                 return response()->json(['message' => 'Utilisateur non trouvé'], 404);
             }
+            $existingReserve = DB::table('rendezs')
+                ->where('id_vehicules', $vehicule->id)
+                ->where(function ($query) use ($req) {
+                    $query->whereBetween('datedebut', [$req->datedebut, $req->datefin])
+                          ->orWhereBetween('datefin', [$req->datedebut, $req->datefin])
+                          ->orWhere(function ($query) use ($req) {
+                            $query->where('datedebut', '<=', $req->datedebut)
+                                ->where('datefin', '>=', $req->datefin);
+                        });
+                })->exists();
+            if ($existingReserve) {
+                return response()->json(['message' => 'Le vehicule est déja réservé pour cette période'], 409);
+            }
 
             $reservation = new Rendez();
             $reservation->id_vehicules = $vehicule->id;
@@ -292,21 +305,18 @@ class SuperAdminController extends Controller
             'newPass' => 'required|min:6|confirmed',
         ]);
 
-
         $user = auth()->user();
 
-        if (!Hash::check($request->ancien, $user->password)) {
-
         if (! Hash::check($request->ancien, $user->password)) {
-            return response()->json(['message' => 'L\'ancien mot de passe est incorrect.'], 400);
-        }
 
+            if (! Hash::check($request->ancien, $user->password)) {
+                return response()->json(['message' => 'L\'ancien mot de passe est incorrect.'], 400);
+            }
 
-        $user->password = Hash::make($request->newPass);
-        $user->save();
+            $user->password = Hash::make($request->newPass);
+            $user->save();
 
-
-        return response()->json(['message' => 'Mot de passe mis à jour avec succès.']);
+            return response()->json(['message' => 'Mot de passe mis à jour avec succès.']);
         }
     }
 
@@ -316,10 +326,9 @@ class SuperAdminController extends Controller
         try {
             // Vérifiez si l'utilisateur existe
             $user = User::find($id);
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['message' => 'Utilisateur non trouvé'], 404);
             }
-
 
             // Récupérer les réservations de l'utilisateur spécifié par $id
             $reservations = DB::table('rendezs')
