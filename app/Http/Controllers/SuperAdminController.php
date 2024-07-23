@@ -2,285 +2,143 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use app\Http\models\users;
-use app\Http\Requests\UserStoreRequest;
-use App\Models\Galerie;
 use App\Models\User;
-use App\Models\Rendez;
-use App\Models\Vehicules;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class SuperAdminController extends Controller
 {
-//User
-    public function index(){
+
+    public function index()
+    {
         try {
             $users = User::all();
-            return response()->json(['users'=>$users]);
+            return response()->json($users);
         } catch (\Exception $e) {
-            \log::error('Erreur lors de la récupération des utilisateurs: ' . $e->getMessage());
-
-            return response()->json(['error' => 'Erreur lors de la récupération des utilisateurs', 'details' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    public function store(UserStoreRequest $request)
+
+    public function register(Request $request)
     {
         try {
-            User::create([
+            // Validation des données
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'firstname' => 'nullable|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'job' => 'nullable|string|max:255',
+                'contact' => 'nullable|string|max:255',
+                'photo' => 'nullable|image|max:2048', // Taille maximale de 2MB pour l'image
+                'role' => 'string|in:Admin,SuperAdmin', // Assurez-vous que Role est valide
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+
+            // Enregistrement de la photo
+            $photoPath = null;
+            if ($request->hasFile('photo')) {
+                $photo = $request->file('photo');
+                $photoPath = $photo->store('photos', 'public'); // Enregistrer le fichier dans storage/app/public/photos
+            }
+
+            // Création de l'utilisateur
+            $User = User::create([
                 'name' => $request->name,
+                'firstname' => $request->firstname,
                 'email' => $request->email,
-                'password' => $request->password
+                'password' => Hash::make($request->password),
+                'job' => $request->job,
+                'role' => $request->input('role', 'Admin'), // Définir 'Admin' comme rôle par défaut
+                'contact' => $request->contact,
+                'photo' => $photoPath, // Chemin d'accès au fichier de photo enregistré
             ]);
-            return response()->json([
-                'message' => 'user successfully created'
-            ],200);
 
-        }catch(\Exception $e){
-            return response()->json([
-                'message' => 'something went really wrong'
-            ],500);
-        }
-    }
-
-
-    public function show($id){
-        $users = user::find($id);
-        if(!$users){
-         return response()->json(['message'=> 'user not found'],404);
-        }
-        return response()->json([
-            'resultat' => $users
-        ],200);
-
-    }
-
-//affichage vehicules
-    public function viewVehicule(){
-        try {
-            $vehicules = Vehicules::all();
-
-        return response()->json([
-            'vehicules'=>$vehicules
-        ],200);
+            return response()->json(['message' => 'User created successfully']);
         } catch (\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ],500);
-        }
-
-    }
-
-//suppression vehicules
-    public function delete($id){
-        // recuperation id
-        $getId= Vehicules::find($id);
-
-        $getId->delete();
-
-        return response()->json([
-            'message' => 'suprrimer'
-        ],200);
-    }
-
-//Ajout des vehicules
-    public function storeUpload(Request $req){
-        try {
-            $photo = $req->file('photo');
-            $photoName = $photo->getClientOriginalName();
-            $photoPath = $photo->storeAs('public/ImageVehicule', $photoName);
-    
-            $InsertVehicul = new Vehicules();
-            $InsertVehicul->marque = $req->marque;
-            $InsertVehicul->matricule = $req->matricule;
-            $InsertVehicul->photo = $photoName;
-            $InsertVehicul->save();
-    
-            return response()->json([
-                'message' => 'File uploaded successfully',
-                'file_path' => "/storage/photos/$photoName", // Adjust as per your storage structure
-                'path' => Storage::url("public/photos/$photoName")
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ], 500);
+            return response()->json(['message' => $e->getMessage()], 500); // Capture et retourne l'erreur
         }
     }
-    
-//affichage des vehicule par id
-    public function showVehicule($id){
-        $car = Vehicules::find($id);
-        $error = 'sucsesful';
-        return response()->json([
-            'car' => $car,
-            'message' => $error
-        ],200);
-    }
-//modifier les vehicule
-    public function updateCar(Request $req, $id)
+    public function updateUser(Request $request, $id)
     {
-
         try {
-            $req->validate([
-                "marque"=>"required",
-                "matricule"=>"required",
-                "photo"=>"required"
+            // Valider les données de la requête
+            $validator = Validator::make($request->all(), [
+                'name' => 'string|max:255',
+                'firstname' => 'string|max:255',
+                'email' => 'string|email|max:255|unique:users,email,' . $id,
+                'password' => 'string|min:8',
+                'Job' => 'nullable|string|max:255',
+                'contact' => 'nullable|string|max:255',
+                'photo' => 'nullable|image|max:2048',
+                'Role' => 'string|in:Admin,SuperAdmin', // Assurez-vous que Role est valide
             ]);
-            //recuperation de l'id
-            $InsertVehicul = Vehicules::find($id);
 
-            //modification du photo
-            if ($req->hasFile('photo')) {
-            $photo = $req->file('photo');
-            $photoName = time() . '.' . $photo->getClientOriginalExtension();
-            $photoPath = $photo->storeAs('ImageVehicule',$photoName,'public');
-            $InsertVehicul->photo = $photoName;
-
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+            $photoPath = null;
+            if ($request->hasFile('photo')) {
+                $photo = $request->file('photo');
+                $photoPath = $photo->store('photos', 'public'); // Enregistrer le fichier dans storage/app/public/photos
             }
 
-            //modifiation des donnes
-            $InsertVehicul->marque = $req->marque;
-            $InsertVehicul->matricule = $req->matricule;
-            $InsertVehicul->update();
+            // Trouver l'utilisateur à mettre à jour
+            $user = User::findOrFail($id);
 
-            return response()->json([
-                'message' => 'modiifer!',
-                'vehicule' => $InsertVehicul
-            ],200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ],500);
-        }
-    }
-
-//insertion galeries des vehicules
-    public function InsertGalerie(Request $req,$id){
-        try {
-            $galerie = new Galerie();
-            $galerie->vehicules_id=$id;
-            if ($req->hasFile('image')) {
-                $photo = $req->file('image');
-                $photoName = time() . '.' . $photo->getClientOriginalExtension();
-                $photoPath = $photo->storeAs('GalerieVehicule',$photoName,'public');
-                $galerie->image = $photoName;
+            // Mettre à jour les champs seulement si ils existent
+            if ($request->has('name')) {
+                $user->name = $request->name;
             }
-            $galerie->save();
+            if ($request->has('firstname')) {
+                $user->firstname = $request->firstname;
+            }
+            if ($request->has('email')) {
+                $user->email = $request->email;
+            }
+            if ($request->has('password')) {
+                $user->password = Hash::make($request->password);
+            }
+            if ($request->has('Job')) {
+                $user->Job = $request->Job;
+            }
+            if ($request->has('contact')) {
+                $user->contact = $request->contact;
+            }
+            if ($request->hasFile('photo')) {
+                $photo = $request->file('photo');
+                $photoName = time().'.'.$photo->getClientOriginalExtension();
+                $photoPath = $photo->storeAs('photos', $photoName, 'public');
+                $user->photo = $photoName;
+            }
+            if ($request->has('Role')) {
+                $user->Role = $request->Role;
+            }
 
+            // Sauvegarder les modifications
+            $user->save();
 
-
-
-            return response()->json([
-                'message' => 'galerie ajoute',
-                'galerie'=>$galerie
-            ],200);
+            return response()->json(['message' => 'User updated successfully']);
         } catch (\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ],500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
-//affichage des photo dans les galerie
-    public function ViewGalerie($id){
-
-            $View = DB::table('galeries')
-            ->select('image')
-            ->where('vehicules_id',$id)
-            ->get();
-
-            return response()->json([
-                'galerie'=>$View
-            ],200);
-    }
-
-//delete photo galerie
-    public function deleteGalerie($id){
-        // recuperation id
-        $getId= Galerie::find($id);
-
-        $getId->delete();
-
-        return response()->json([
-            'message' => 'suprrimer'
-        ],200);
-    }
-
-//reservation Vehicule
-    public function reserver(Request $req, $id){
-        try{
-            $reservation = new Rendez();
-            $vehicules = DB::table('vehicules')->where('id', $id)->first();
-            $users = DB::table('users')->where('id', $id)->first();
-
-            // $vehicules = Vehicule::find($id);
-            $reservation->id_vehicules = $vehicules->id;
-            $reservation->users = Session::get("users")->id;
-            $reservation->datedebut = $req->datedebut;
-            $reservation->datefin = $req->datefin;
-            $reservation->save();
-            return response()->json([
-                'message' => 'something went really wrong'
-            ],500);
-        }catch(\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ],500);
-        }
-    }
-//modifier profil
-    public function ModProfil(Request $req, $id)
+    public function deleteUser($id)
     {
-
         try {
-            $req->validate([
-                "nom"=>"required",
-                "email"=>"required",
+            // Trouver l'utilisateur à supprimer
+            $user = User::findOrFail($id);
 
-            ]);
-            //recuperation de l'id
-            $ModProfil = User::find($id);
+            // Supprimer l'utilisateur
+            $user->delete();
 
-
-
-            //modifiation des donnes
-            $ModProfil->nom = $req->nom;
-            $ModProfil->email = $req->email;
-            $ModProfil->update();
-
-            return response()->json([
-                'message' => 'modiifer!',
-
-            ],200);
-
+            return response()->json(['message' => 'User deleted successfully']);
         } catch (\Exception $e) {
-            return response()->json([
-                'messageError' => $e->getMessage()
-            ],500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-//Modification Mot de passe
-    public function ModMdp(Request $request, $id){
-        $request->validate([
-            'ancien' => 'required',
-            'newPass' => 'required|min:6|confirmed',
-        ]);
-
-        $user = auth()->user();
-
-        if (!Hash::check($request->ancien, $user->password)) {
-            return response()->json(['message' => 'L\'ancien mot de passe est incorrect.'], 400);
-        }
-
-        $user->password = Hash::make($request->newPass);
-        $user->save();
-
-        return response()->json(['message' => 'Mot de passe mis à jour avec succès.']);
-    }
-
-
-
 }
