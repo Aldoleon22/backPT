@@ -8,10 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Rendez extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'users',
-        'id_vehicules',
-        'datedebut',
-        'datefin',
-    ];
+    protected $fillable = ['id_vehicules', 'users', 'datedebut', 'datefin'];
 }

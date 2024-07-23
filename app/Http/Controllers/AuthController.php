@@ -7,8 +7,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 // use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 use Session;
 
@@ -43,7 +43,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json(['message' => 'Invalid login details'], 401);
         }
 
@@ -54,44 +54,47 @@ class AuthController extends Controller
          $SessionId=Session::get('user')->id;
         return response()->json([
             'userName' => $user->name,
+            'userEmail' => $user->email,
+            'userId' => $user->id,
             'role' => $user->status,
             'access_token' => $token,
             'Session' => $SessionId,
             'token_type' => 'Bearer',
         ]);
     }
+
     public function updateUser(Request $request, $id)
-{
-    $user = User::findOrFail($id);
+    {
+        $user = User::findOrFail($id);
 
-    $validator = Validator::make($request->all(), [
-        'name' => 'string|max:255',
-        'email' => 'string|email|max:255|unique:users,email,'.$user->id,
-        'password' => 'string|min:8|confirmed',
-        'status' => 'string|in:superAdmin,admin,user',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255',
+            'email' => 'string|email|max:255|unique:users,email,'.$user->id,
+            'password' => 'string|min:8|confirmed',
+            'status' => 'string|in:superAdmin,admin,user',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 400);
-    }
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
-    if ($request->has('name')) {
-        $user->name = $request->name;
-    }
-    if ($request->has('email')) {
-        $user->email = $request->email;
-    }
-    if ($request->has('password')) {
-        $user->password = Hash::make($request->password);
-    }
-    if ($request->has('status')) {
-        $user->status = $request->status;
-    }
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        if ($request->has('status')) {
+            $user->status = $request->status;
+        }
 
-    $user->save();
+        $user->save();
 
-    return response()->json(['message' => 'User updated successfully']);
-}
+        return response()->json(['message' => 'User updated successfully']);
+    }
 
 public function deleteUser($id)
 {
@@ -116,10 +119,10 @@ public function updateStatus(Request $request, $id)
 
     // Trouver l'utilisateur par son id
     $user = User::findOrFail($id);
-    
+
     // Mettre à jour le statut
     $user->status = $request->status;
-    
+
     // Sauvegarder les changements
     $user->save();
 

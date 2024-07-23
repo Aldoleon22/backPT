@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserConttroller;
+use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -34,21 +34,22 @@ Route::put('users/{id}', [SuperAdminController::class, 'updateUser']); // Route 
 Route::delete('usersDelete/{id}', [SuperAdminController::class, 'deleteUser']); // Route pour la suppression de l'utilisateur
 
 //vehicule
-Route::get('listeVehicul' , [SuperAdminController::class, 'viewVehicule']);
-Route::delete('cardelete/{id}',[SuperAdminController::class, 'delete']);
-Route::post('addCar',[SuperAdminController::class, 'StoreUpload']);
-Route::post('updatCar/{id}',[SuperAdminController::class, 'updateCar']);
-Route::get('listeVehicule/{id}' , [SuperAdminController::class, 'showVehicule']);
+Route::get('listeVehicul', [SuperAdminController::class, 'viewVehicule']);
+Route::delete('cardelete/{id}', [SuperAdminController::class, 'delete']);
+Route::post('addCar', [SuperAdminController::class, 'StoreUpload']);
+Route::post('updatCar/{id}', [SuperAdminController::class, 'updateCar']);
+Route::get('listeVehicule/{id}', [SuperAdminController::class, 'showVehicule']);
 
 //ajout des galerie des vehicules
-Route::post('addGalerie/{id}',[SuperAdminController::class, 'InsertGalerie']);
-Route::get('viewGalerie/{id}' , [SuperAdminController::class, 'ViewGalerie']);
-Route::delete('PhotoDelete/{id}',[SuperAdminController::class, 'deleteGalerie']);
+Route::post('addGalerie/{id}', [SuperAdminController::class, 'InsertGalerie']);
+Route::get('viewGalerie/{id}', [SuperAdminController::class, 'ViewGalerie']);
+Route::delete('PhotoDelete/{id}', [SuperAdminController::class, 'deleteGalerie']);
 
 //reservation
-Route::post('reservation/{id}',[SuperAdminController::class, 'reserver'] );
 
+Route::post('reservation/{id}', [SuperAdminController::class, 'reserver']);
 Route::post('/modifier_mot_de_passe', [SuperAdminController::class, 'ModMdp']);
 //reservation bolo
 
 
+Route::get('reservations/{id}', [SuperAdminController::class, 'afficheReservation']);
